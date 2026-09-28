@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0A0F" />
+<title>MSFI Investor — Personal Investment Journal</title>
+<meta name="description" content="MSFI Investor is a personal investment journal and analytics companion for iPhone. Multi-portfolio tracking, trade journal with photo attachments, self-rendered candle/line/mountain charts, and offline price studio — all stored locally." />
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2300E5A0'/><stop offset='100%' stop-color='%239C77E3'/></linearGradient></defs><circle cx='32' cy='32' r='28' fill='url(%23g)'/><path d='M22 38l8-14 6 10 6-8' stroke='white' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+<style>
+  :root{
+    --bg:#0A0A0F;
+    --bg-2:#0F101A;
+    --card:#171823;
+    --card-2:#1C1E2C;
+    --stroke:#262839;
+    --text:#F5F6F8;
+    --text-2:#A8ACBC;
+    --text-3:#66697A;
+    --brand:#00E5A0;
+    --brand-2:#9C77E3;
+    --gain:#4DE56D;
+    --loss:#FF4D6D;
+    --warning:#FFBF60;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .container{max-width:1120px;margin:0 auto;padding:0 22px}
+  .nav{position:sticky;top:0;z-index:30;background:rgba(10,10,15,.72);backdrop-filter:saturate(160%) blur(18px);-webkit-backdrop-filter:saturate(160%) blur(18px);border-bottom:1px solid rgba(255,255,255,.05)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+  .brand-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand-2));display:flex;align-items:center;justify-content:center;color:#fff}
+  .brand-mark svg{width:18px;height:18px}
+  .brand-name{font-size:16px}
+  .nav-links{display:flex;gap:22px;font-size:13px;color:var(--text-2)}
+  .nav-links a{transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{background:var(--brand);color:#04140E;padding:8px 14px;border-radius:999px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+  .hero{position:relative;padding:84px 0 56px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 600px at 50% -10%, rgba(0,229,160,.18), transparent 60%), radial-gradient(900px 500px at 90% 20%, rgba(156,119,227,.18), transparent 60%);pointer-events:none}
+  .hero-inner{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  @media (max-width:880px){.hero-inner{grid-template-columns:1fr;gap:40px}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,.10);color:var(--brand);border:1px solid rgba(0,229,160,.25);padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px rgba(0,229,160,.18)}
+  h1{font-size:clamp(38px,5.6vw,64px);line-height:1.04;margin:18px 0 18px;letter-spacing:-.02em;font-weight:800}
+  h1 .grad{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:18px;color:var(--text-2);max-width:560px;margin:0 0 28px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:14px;font-weight:700;font-size:15px;border:1px solid transparent;transition:transform .15s ease, background .2s}
+  .btn-primary{background:var(--brand);color:#04140E}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--stroke);color:var(--text)}
+  .btn-ghost:hover{background:rgba(255,255,255,.07)}
+  .trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:var(--text-3);font-size:12px}
+  .trust-row span{display:inline-flex;align-items:center;gap:6px}
+  .phone{position:relative;width:300px;height:610px;margin:0 auto;border-radius:44px;padding:14px;background:linear-gradient(180deg,#22243A,#0F101A);box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05)}
+  @media (max-width:880px){.phone{width:280px;height:570px}}
+  .phone-screen{position:relative;width:100%;height:100%;border-radius:32px;background:linear-gradient(180deg,#0F101A,#0A0A0F);overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:96px;height:22px;background:#000;border-radius:14px;z-index:2}
+  .screen-content{padding:44px 16px 16px;display:flex;flex-direction:column;gap:10px;height:100%}
+  .ph-bar{display:flex;justify-content:space-between;align-items:center;color:var(--text-2);font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:0 4px}
+  .ph-title{font-size:11px;color:var(--text-3);font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;margin:4px 0 2px}
+  .ph-card{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:12px}
+  .ph-tabs{display:flex;gap:8px;padding:2px}
+  .ph-tab{flex:1;text-align:center;font-size:10px;font-weight:700;color:var(--text-2);padding:8px 6px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--stroke)}
+  .ph-tab.active{background:rgba(0,229,160,.12);color:var(--brand);border-color:rgba(0,229,160,.35)}
+  .ph-candle{position:relative;height:170px;border-radius:12px;background:linear-gradient(180deg,#10111B,#0A0A0F);border:1px solid var(--stroke);padding:8px;overflow:hidden}
+  svg.candle-svg{width:100%;height:100%}
+  .ph-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+  .ph-row .l{color:var(--text-2)}
+  .ph-row .v{color:var(--text);font-weight:700}
+  .ph-row .v.up{color:var(--gain)}
+  .ph-row .v.down{color:var(--loss)}
+  .ph-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(0,229,160,.10);color:var(--brand);border:1px solid rgba(0,229,160,.22);padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700}
+  .section{padding:84px 0;border-top:1px solid rgba(255,255,255,.05)}
+  .section h2{font-size:clamp(28px,3.6vw,42px);letter-spacing:-.02em;margin:0 0 14px;font-weight:800}
+  .section .sub{color:var(--text-2);font-size:17px;max-width:680px;margin:0 0 36px}
+  .grid{display:grid;gap:18px}
+  .grid-5{grid-template-columns:repeat(5,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:980px){.grid-5{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:620px){.grid-5,.grid-3,.grid-2{grid-template-columns:1fr}}
+  .feature{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--stroke);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:transform .25s, border-color .25s}
+  .feature:hover{transform:translateY(-3px);border-color:rgba(0,229,160,.35)}
+  .feature .icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(0,229,160,.12);color:var(--brand);border:1px solid rgba(0,229,160,.22)}
+  .feature h3{margin:4px 0 0;font-size:17px;letter-spacing:-.01em}
+  .feature p{margin:0;color:var(--text-2);font-size:14px;line-height:1.6}
+  .module{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--stroke);border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:14px}
+  .module .tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--brand-2);letter-spacing:.1em;text-transform:uppercase}
+  .module h3{font-size:22px;margin:0;letter-spacing:-.01em}
+  .module p{margin:0;color:var(--text-2);font-size:14.5px}
+  .module ul{margin:6px 0 0;padding-left:18px;color:var(--text-2);font-size:14px}
+  .module ul li{margin:6px 0}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .pill{background:rgba(255,255,255,.04);border:1px solid var(--stroke);color:var(--text-2);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill.brand{background:rgba(0,229,160,.08);color:var(--brand);border-color:rgba(0,229,160,.22)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+  @media (max-width:880px){.split{grid-template-columns:1fr}}
+  .mock{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--stroke);border-radius:22px;padding:18px}
+  .donut-wrap{display:flex;gap:18px;align-items:center}
+  .donut{width:160px;height:160px;flex-shrink:0}
+  .legend{display:flex;flex-direction:column;gap:8px;flex:1}
+  .legend-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--stroke);border-radius:10px}
+  .legend-row .l{display:flex;align-items:center;gap:8px;color:var(--text-2)}
+  .legend-row .sw{width:10px;height:10px;border-radius:3px}
+  .legend-row .r{color:var(--text);font-weight:700}
+  .journal-row{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--stroke);border-radius:12px}
+  .journal-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(77,229,109,.12);color:var(--gain)}
+  .journal-meta{flex:1}
+  .journal-meta .s{font-size:13px;color:var(--text);font-weight:700}
+  .journal-meta .d{font-size:11px;color:var(--text-3);margin-top:2px}
+  .journal-amt{font-size:13px;font-weight:700}
+  .journal-amt.up{color:var(--gain)}
+  .journal-amt.down{color:var(--loss)}
+  .heatmap{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  @media (max-width:620px){.heatmap{grid-template-columns:repeat(4,1fr)}}
+  .hm{aspect-ratio:1/1;border-radius:10px;display:flex;align-items:flex-end;justify-content:flex-start;padding:8px;font-size:10px;font-weight:700;color:#0a0a0f}
+  .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media (max-width:880px){.principles{grid-template-columns:1fr}}
+  .principle{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--stroke);border-radius:18px;padding:22px}
+  .principle h4{margin:0 0 8px;font-size:15px;letter-spacing:-.01em}
+  .principle p{margin:0;color:var(--text-2);font-size:14px}
+  .principle.do{border-color:rgba(0,229,160,.28)}
+  .principle.dont{border-color:rgba(255,77,109,.28)}
+  .do-badge,.dont-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .do-badge{background:rgba(77,229,109,.12);color:var(--gain);border:1px solid rgba(77,229,109,.28)}
+  .dont-badge{background:rgba(255,77,109,.12);color:var(--loss);border:1px solid rgba(255,77,109,.28)}
+  .faq details{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--stroke);border-radius:14px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+  .faq details[open]{border-color:rgba(0,229,160,.28)}
+  .faq summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";color:var(--brand);font-size:20px;font-weight:700;transition:transform .2s}
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq p{margin:10px 0 0;color:var(--text-2);font-size:14px;line-height:1.65}
+  .final-cta{background:linear-gradient(135deg,rgba(0,229,160,.14),rgba(156,119,227,.14));border:1px solid rgba(0,229,160,.25);border-radius:24px;padding:44px 28px;text-align:center}
+  .final-cta h2{margin:0 0 10px;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em}
+  .final-cta p{color:var(--text-2);margin:0 0 20px}
+  footer{border-top:1px solid rgba(255,255,255,.05);padding:36px 0;color:var(--text-3);font-size:13px}
+  .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+  .footer-links{display:flex;gap:18px;flex-wrap:wrap}
+  .footer-links a:hover{color:var(--text)}
+  .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top" aria-label="MSFI Investor home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-7 4 5 4-3 5 6"/></svg>
+      </span>
+      <span class="brand-name">MSFI Investor</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#modules">Modules</a>
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#support">Support</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="nav-cta" href="#download">Get on iPhone</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Personal Investment Journal</span>
+        <h1>Keep a clean record of <span class="grad">every trade</span>, and the reason behind it.</h1>
+        <p class="lead">MSFI Investor is a multi-portfolio tracker, a tagged trade journal with photo attachments, an offline chart studio, and a focused analytics toolkit — built for investors who want one app that does a few things exceptionally well.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.43 2.235-1.13 3.06-.74.86-1.95 1.5-2.99 1.41-.13-1.12.39-2.28 1.06-3.04.74-.86 2.01-1.5 3.06-1.43zM21 17.31c-.43 1.02-.94 2.01-1.62 2.91-.94 1.24-1.81 2.49-3.27 2.51-1.43.02-1.79-.93-3.71-.92-1.92.01-2.32.94-3.75.93-1.46-.02-2.3-1.27-3.24-2.51C2.16 16.43 1.6 11.7 4.27 8.84c1.34-1.43 3.31-2.34 5.21-2.34 1.93 0 3.14.99 4.74.99 1.55 0 2.49-.99 4.7-.99 1.67 0 3.45.91 4.72 2.49-4.14 2.27-3.46 8.18-2.64 8.32z" /></svg>
+            Download for iPhone
+          </a>
+          <a class="btn btn-ghost" href="#modules">Explore modules →</a>
+        </div>
+        <div class="trust-row">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            100% on-device storage
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-7"/></svg>
+            No accounts, no analytics
+          </span>
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+            No brokerage links
+          </span>
+        </div>
+      </div>
+
+      <div class="phone" role="img" aria-label="MSFI Investor app preview showing a candlestick chart on the Markets tab">
+        <div class="phone-screen">
+          <div class="notch"></div>
+          <div class="screen-content">
+            <div class="ph-bar"><span>9:41</span><span>•••</span></div>
+            <div class="ph-title">Markets · AAPL</div>
+            <div class="ph-card" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:11px;color:var(--text-3);font-weight:700;letter-spacing:.08em;text-transform:uppercase">Apple Inc.</div>
+                <div style="font-size:18px;font-weight:800;margin-top:2px">$198.42</div>
+              </div>
+              <div style="text-align:right">
+                <span class="ph-chip">+1.84%</span>
+                <div style="font-size:10px;color:var(--text-3);margin-top:6px">1D · NYSE</div>
+              </div>
+            </div>
+            <div class="ph-candle">
+              <svg class="candle-svg" viewBox="0 0 260 150" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4DE56D" stop-opacity=".35"/><stop offset="100%" stop-color="#4DE56D" stop-opacity="0"/></linearGradient>
+                  <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF4D6D" stop-opacity=".35"/><stop offset="100%" stop-color="#FF4D6D" stop-opacity="0"/></linearGradient>
+                </defs>
+                <path d="M0 110 L20 100 L40 95 L60 105 L80 80 L100 70 L120 75 L140 60 L160 55 L180 65 L200 50 L220 45 L240 55 L260 40 L260 150 L0 150 Z" fill="url(#g1)"/>
+                <path d="M0 110 L20 100 L40 95 L60 105 L80 80 L100 70 L120 75 L140 60 L160 55 L180 65 L200 50 L220 45 L240 55 L260 40" fill="none" stroke="#4DE56D" stroke-width="1.6"/>
+                <g fill="#4DE56D">
+                  <rect x="14" y="92" width="6" height="14" rx="1"/><line x1="17" y1="86" x2="17" y2="112" stroke="#4DE56D" stroke-width="1"/>
+                  <rect x="54" y="98" width="6" height="14" rx="1"/><line x1="57" y1="92" x2="57" y2="118" stroke="#4DE56D" stroke-width="1"/>
+                  <rect x="94" y="64" width="6" height="14" rx="1"/><line x1="97" y1="58" x2="97" y2="84" stroke="#4DE56D" stroke-width="1"/>
+                  <rect x="134" y="54" width="6" height="14" rx="1"/><line x1="137" y1="48" x2="137" y2="74" stroke="#4DE56D" stroke-width="1"/>
+                  <rect x="174" y="58" width="6" height="14" rx="1"/><line x1="177" y1="52" x2="177" y2="78" stroke="#4DE56D" stroke-width="1"/>
+                  <rect x="214" y="40" width="6" height="14" rx="1"/><line x1="217" y1="34" x2="217" y2="60" stroke="#4DE56D" stroke-width="1"/>
+                </g>
+                <g fill="#FF4D6D">
+                  <rect x="34" y="88" width="6" height="14" rx="1"/><line x1="37" y1="82" x2="37" y2="108" stroke="#FF4D6D" stroke-width="1"/>
+                  <rect x="74" y="74" width="6" height="14" rx="1"/><line x1="77" y1="68" x2="77" y2="94" stroke="#FF4D6D" stroke-width="1"/>
+                  <rect x="114" y="68" width="6" height="14" rx="1"/><line x1="117" y1="62" x2="117" y2="88" stroke="#FF4D6D" stroke-width="1"/>
+                  <rect x="154" y="50" width="6" height="14" rx="1"/><line x1="157" y1="44" x2="157" y2="70" stroke="#FF4D6D" stroke-width="1"/>
+                  <rect x="194" y="46" width="6" height="14" rx="1"/><line x1="197" y1="40" x2="197" y2="66" stroke="#FF4D6D" stroke-width="1"/>
+                </g>
+              </svg>
+            </div>
+            <div class="ph-card" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <div><div style="font-size:10px;color:var(--text-3)">Open</div><div style="font-size:12px;font-weight:700">195.10</div></div>
+              <div><div style="font-size:10px;color:var(--text-3)">High</div><div style="font-size:12px;font-weight:700;color:var(--gain)">199.04</div></div>
+              <div><div style="font-size:10px;color:var(--text-3)">Low</div><div style="font-size:12px;font-weight:700;color:var(--loss)">194.55</div></div>
+            </div>
+            <div class="ph-tabs">
+              <div class="ph-tab">1D</div>
+              <div class="ph-tab active">1W</div>
+              <div class="ph-tab">1M</div>
+              <div class="ph-tab">3M</div>
+              <div class="ph-tab">1Y</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="modules">
+    <div class="container">
+      <h2>Five deep modules. No shallow tabs.</h2>
+      <p class="sub">Each section of MSFI Investor is built to do one thing well, not ten things shallowly. Open one and stay in it.</p>
+      <div class="grid grid-3">
+        <article class="module">
+          <span class="tag">01 · Markets</span>
+          <h3>70+ instruments, ten exchanges</h3>
+          <p>Browse instruments across NYSE, NASDAQ, LSE, FRA, SIX, HKEX, TSE, ASX, TSX, and KRX with sector tags, market cap sorting, and a starred watchlist.</p>
+          <ul>
+            <li>Self-rendered candle, line, and mountain charts</li>
+            <li>Five timeframes with crosshair inspection</li>
+            <li>Drag-driven price alerts</li>
+            <li>Tap any ticker for Buy / Sell / Alert / About</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">Offline</span>
+            <span class="pill">10 exchanges</span>
+            <span class="pill">5 timeframes</span>
+          </div>
+        </article>
+
+        <article class="module">
+          <span class="tag">02 · Portfolio</span>
+          <h3>Multi-portfolio, multi-currency</h3>
+          <p>Manage named portfolios with custom accent colors, per-portfolio base currencies, target allocations, and automatic cost basis calculation across every entry.</p>
+          <ul>
+            <li>Donut chart of current allocation</li>
+            <li>90-day performance curve</li>
+            <li>Rebalance advisor with drift alerts</li>
+            <li>Cost basis per holding, updated live</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">Auto cost basis</span>
+            <span class="pill">9 currencies</span>
+            <span class="pill">Rebalance advisor</span>
+          </div>
+        </article>
+
+        <article class="module">
+          <span class="tag">03 · Journal</span>
+          <h3>Trades become history</h3>
+          <p>Record buys, sells, dividends, splits, transfers, and fees. Tag entries, attach up to six photos each from camera or library, and search across symbols, notes, and tags.</p>
+          <ul>
+            <li>CSV export of every journal entry</li>
+            <li>Full-text search across notes</li>
+            <li>Up to 6 photo attachments per entry</li>
+            <li>Custom labels for strategies and theses</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">Photo attachments</span>
+            <span class="pill">CSV export</span>
+            <span class="pill">Custom tags</span>
+          </div>
+        </article>
+
+        <article class="module">
+          <span class="tag">04 · Tools</span>
+          <h3>Calculators that match your decisions</h3>
+          <p>Five focused utilities for the questions you ask before and after a trade — without dragging in a full-featured terminal app.</p>
+          <ul>
+            <li>Currency converter · 9 currencies</li>
+            <li>DCA simulator with monthly contributions</li>
+            <li>Scenario planner · target prices and bear cases</li>
+            <li>Sector heatmap of market momentum</li>
+            <li>Compare up to 4 tickers on one normalized chart</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">DCA simulator</span>
+            <span class="pill">Compare 4×</span>
+            <span class="pill">Heatmap</span>
+          </div>
+        </article>
+
+        <article class="module">
+          <span class="tag">05 · Insights</span>
+          <h3>Eight short essays, five lessons</h3>
+          <p>A focused reading list on portfolio theory and a graded lesson path — Beginner, Intermediate, Advanced — to keep your process honest.</p>
+          <ul>
+            <li>Diversification, average cost, drawdowns</li>
+            <li>Factor exposures and correlation</li>
+            <li>Risk discipline and journal hygiene</li>
+            <li>Tax accuracy and reporting hygiene</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">8 essays</span>
+            <span class="pill">5 lessons</span>
+            <span class="pill">3 levels</span>
+          </div>
+        </article>
+
+        <article class="module" style="background:linear-gradient(135deg,rgba(0,229,160,.10),rgba(156,119,227,.10));border-color:rgba(0,229,160,.25)">
+          <span class="tag" style="color:var(--brand)">Storage · always local</span>
+          <h3>Your journal, your device.</h3>
+          <p>Everything is stored locally in JSON under the app's Documents directory. Attachments live alongside. No account, no analytics, no cloud sync — and nothing is collected about you.</p>
+          <ul>
+            <li>Local JSON snapshot — easy to back up</li>
+            <li>Encrypted at rest by iOS Data Protection</li>
+            <li>Reset All Data wipes everything in one tap</li>
+            <li>Export full state as JSON for transfer</li>
+          </ul>
+          <div class="pill-row">
+            <span class="pill brand">No account</span>
+            <span class="pill brand">No analytics</span>
+            <span class="pill brand">No cloud</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <h2>Built around a single idea.</h2>
+      <p class="sub">A useful journal is the one you actually keep. MSFI Investor is shaped to lower the friction of recording what you did and why.</p>
+      <div class="grid grid-5">
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+          <h3>Multi-portfolio</h3>
+          <p>Separate accounts, strategies, or goals into named portfolios with their own base currency.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-7"/></svg></div>
+          <h3>Auto cost basis</h3>
+          <p>Weighted-average cost updates as you record buys, sells, dividends, and splits — no spreadsheet needed.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
+          <h3>Tagged journal</h3>
+          <p>Tag entries by thesis, sector, or strategy. Search across symbols, notes, and tags instantly.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></div>
+          <h3>Photo attachments</h3>
+          <p>Attach up to six photos per journal entry — broker confirmations, charts, screenshots.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
+          <h3>Self-rendered charts</h3>
+          <p>Candle, line, and mountain — drawn on-device with native Canvas. Five timeframes, crosshair inspection.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
+          <h3>9 currencies</h3>
+          <p>USD, EUR, GBP, JPY, CHF, CAD, AUD, HKD, SGD. Per-portfolio base currency and a built-in converter.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4-4 4 4 4-6 4 8"/></svg></div>
+          <h3>Sector heatmap</h3>
+          <p>See where market momentum is concentrating today — and where your portfolio is exposed.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg></div>
+          <h3>Rebalance advisor</h3>
+          <p>Compare current weights against target allocation and see what to add, trim, or hold.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></div>
+          <h3>Compare 4×</h3>
+          <p>Put up to four tickers on a single normalized chart to compare drawdowns and trends.</p>
+        </article>
+        <article class="feature">
+          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 22v-6M2 12h6M22 12h-6"/><circle cx="12" cy="12" r="4"/></svg></div>
+          <h3>DCA simulator</h3>
+          <p>Model monthly contributions and watch the cost-average converge across volatile months.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div>
+          <span class="eyebrow" style="background:rgba(156,119,227,.10);color:var(--brand-2);border-color:rgba(156,119,227,.25)"><span class="dot" style="background:var(--brand-2);box-shadow:0 0 0 4px rgba(156,119,227,.18)"></span>Portfolio at a glance</span>
+          <h2 style="margin-top:18px">See what you own, what it cost, and what to do next.</h2>
+          <p style="color:var(--text-2);font-size:16px;margin:0 0 18px">Every portfolio shows its current allocation, the 90-day performance curve, and a rebalance advisor that highlights drift from your target. Open any holding to see live cost basis, share count, and realized vs unrealized P/L.</p>
+          <div class="principles">
+            <div class="principle do">
+              <span class="do-badge">Do · keep</span>
+              <h4>One portfolio per strategy.</h4>
+              <p>Long-term core, swing trades, learning account — separate them so the metrics don't lie to each other.</p>
+            </div>
+            <div class="principle dont">
+              <span class="dont-badge">Don't · mix</span>
+              <h4>Don't mix accounts and currencies.</h4>
+              <p>Each portfolio picks one base currency. Convert everything else at the recorded rate to keep totals honest.</p>
+            </div>
+          </div>
+        </div>
+        <div class="mock">
+          <div class="donut-wrap">
+            <svg class="donut" viewBox="0 0 42 42">
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#1d1f2c" stroke-width="6"/>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#00E5A0" stroke-width="6" stroke-dasharray="38 62" stroke-dashoffset="25" transform="rotate(-90 21 21)"/>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#9C77E3" stroke-width="6" stroke-dasharray="22 78" stroke-dashoffset="-13" transform="rotate(-90 21 21)"/>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#FFBF60" stroke-width="6" stroke-dasharray="14 86" stroke-dashoffset="-35" transform="rotate(-90 21 21)"/>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4DE56D" stroke-width="6" stroke-dasharray="10 90" stroke-dashoffset="-49" transform="rotate(-90 21 21)"/>
+              <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#FF4D6D" stroke-width="6" stroke-dasharray="6 94" stroke-dashoffset="-59" transform="rotate(-90 21 21)"/>
+              <text x="21" y="20" text-anchor="middle" fill="#F5F6F8" font-size="6" font-weight="800">$48,210</text>
+              <text x="21" y="26" text-anchor="middle" fill="#A8ACBC" font-size="3">Total Value</text>
+            </svg>
+            <div class="legend">
+              <div class="legend-row"><span class="l"><span class="sw" style="background:#00E5A0"></span>Technology</span><span class="r">38%</span></div>
+              <div class="legend-row"><span class="l"><span class="sw" style="background:#9C77E3"></span>Healthcare</span><span class="r">22%</span></div>
+              <div class="legend-row"><span class="l"><span class="sw" style="background:#FFBF60"></span>Financials</span><span class="r">14%</span></div>
+              <div class="legend-row"><span class="l"><span class="sw" style="background:#4DE56D"></span>Consumer</span><span class="r">10%</span></div>
+              <div class="legend-row"><span class="l"><span class="sw" style="background:#FF4D6D"></span>Energy</span><span class="r">6%</span></div>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="pill brand">Drift: Tech +6.2%</span>
+            <span class="pill">Rebalance: trim 3 names</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="mock">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="journal-row">
+              <div class="journal-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+              <div class="journal-meta"><div class="s">Buy · NVDA · 12 @ $442.10</div><div class="d">Core · thesis: AI infra · 3 photos</div></div>
+              <div class="journal-amt down">−$5,305.20</div>
+            </div>
+            <div class="journal-row">
+              <div class="journal-icon" style="background:rgba(255,77,109,.12);color:var(--loss)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></div>
+              <div class="journal-meta"><div class="s">Sell · AAPL · 8 @ $198.40</div><div class="d">Trim · tag: target-reached · note attached</div></div>
+              <div class="journal-amt up">+$214.10</div>
+            </div>
+            <div class="journal-row">
+              <div class="journal-icon" style="background:rgba(255,191,96,.12);color:var(--warning)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+              <div class="journal-meta"><div class="s">Dividend · MSFT · 4 shares</div><div class="d">Reinvest · tag: income</div></div>
+              <div class="journal-amt">+$11.20</div>
+            </div>
+            <div class="journal-row">
+              <div class="journal-icon" style="background:rgba(156,119,227,.12);color:var(--brand-2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
+              <div class="journal-meta"><div class="s">Split · TSLA · 2:1 adjustment</div><div class="d">Auto-applied · no cost change</div></div>
+              <div class="journal-amt">—</div>
+            </div>
+            <div class="journal-row">
+              <div class="journal-icon" style="background:rgba(0,229,160,.12);color:var(--brand)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg></div>
+              <div class="journal-meta"><div class="s">Fee · Wire transfer · €15</div><div class="d">Tag: brokerage · EUR</div></div>
+              <div class="journal-amt down">−€15.00</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="pill brand">CSV export</span>
+            <span class="pill">JSON snapshot</span>
+            <span class="pill">PNG portfolio card</span>
+          </div>
+        </div>
+        <div>
+          <span class="eyebrow" style="background:rgba(0,229,160,.10);color:var(--brand);border-color:rgba(0,229,160,.25)"><span class="dot"></span>Trade journal</span>
+          <h2 style="margin-top:18px">Five transaction types. One searchable history.</h2>
+          <p style="color:var(--text-2);font-size:16px;margin:0 0 18px">Buys, sells, dividends, splits, transfers, and fees — each one structured, tagged, and exportable. The journal is the source of truth when you need to answer <em style="color:var(--text);font-style:normal">why did I do this?</em> six months later.</p>
+          <div class="principles">
+            <div class="principle do">
+              <span class="do-badge">Do · tag</span>
+              <h4>Tag every entry with a thesis.</h4>
+              <p>"Core, AI infra, target reached" is searchable later. A trade without a tag becomes a regret.</p>
+            </div>
+            <div class="principle dont">
+              <span class="dont-badge">Don't · skip</span>
+              <h4>Don't skip the small entries.</h4>
+              <p>Dividends and fees move your basis. Record them — the journal is the only place they live.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="privacy">
+    <div class="container">
+      <div class="split">
+        <div>
+          <span class="eyebrow" style="background:rgba(0,229,160,.10);color:var(--brand);border-color:rgba(0,229,160,.25)"><span class="dot"></span>Privacy by design</span>
+          <h2 style="margin-top:18px">No account. No analytics. No cloud.</h2>
+          <p style="color:var(--text-2);font-size:16px;margin:0 0 14px">MSFI Investor collects nothing about you. There is no sign-up, no email, no device fingerprinting, no advertising identifier, no crash reporting SDK, no third-party analytics, and no cloud sync.</p>
+          <p style="color:var(--text-2);font-size:16px);margin:0">All data — portfolios, transactions, tags, attachments, watchlist, and price alerts — is stored locally in a JSON file inside the app's sandboxed Documents directory. iOS encrypts that directory at rest when the device is locked. The only way data leaves the device is if you tap the Export button and choose to share it.</p>
+          <div style="margin-top:18px"><a class="btn btn-ghost" href="privacy.html">Read the full Privacy Policy →</a></div>
+        </div>
+        <div class="mock">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Account</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Analytics SDK</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Crash reporter</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Advertising ID</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Cloud sync</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Brokerage link</span><span class="r" style="color:var(--text-3)">None</span></div>
+            <div class="legend-row" style="font-size:14px"><span class="l"><span class="sw" style="background:var(--brand)"></span>Network calls</span><span class="r" style="color:var(--text-3)">Zero</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="support">
+    <div class="container">
+      <div class="grid grid-2">
+        <article class="module">
+          <span class="tag">Support</span>
+          <h3>Need a hand?</h3>
+          <p>Questions, feature ideas, bug reports, or simply feedback — we read every message. The fastest path to a real person is email.</p>
+          <ul>
+            <li>Response window: typically within 2 business days</li>
+            <li>Language: English</li>
+            <li>Include your iOS version and device model for bug reports</li>
+          </ul>
+          <a class="btn btn-primary" style="margin-top:8px;align-self:flex-start" href="mailto:karlawsokunevajob68@gmail.com">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            karlawsokunevajob68@gmail.com
+          </a>
+        </article>
+
+        <article class="module">
+          <span class="tag">Important</span>
+          <h3>Read before you trade.</h3>
+          <p>MSFI Investor is a journal, not a brokerage. It does not connect to any exchange, does not execute trades, and does not hold funds. Charts are illustrative and derived from a deterministic seed keyed to each symbol — they are not live market data and not predictive.</p>
+          <ul>
+            <li>Not investment advice · no buy/sell signals</li>
+            <li>Past performance does not guarantee future results</li>
+            <li>You are responsible for tax accuracy in your jurisdiction</li>
+          </ul>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <a class="btn btn-ghost" href="terms.html">Terms of Use →</a>
+            <a class="btn btn-ghost" href="privacy.html">Privacy Policy →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <h2>Frequently asked</h2>
+      <p class="sub">Quick answers to the questions we get most often.</p>
+      <div class="faq">
+        <details>
+          <summary>Does MSFI Investor connect to my brokerage?</summary>
+          <p>No. MSFI Investor does not connect to any brokerage, exchange, wallet, or trading venue. It never holds funds and never executes trades. Every transaction you record is entered manually.</p>
+        </details>
+        <details>
+          <summary>Where is my data stored?</summary>
+          <p>Everything is stored locally on your device in a JSON file inside the app's sandboxed Documents directory. iOS encrypts that directory at rest. Attachments live alongside the snapshot. There is no cloud copy and no backup server.</p>
+        </details>
+        <details>
+          <summary>Are the charts live?</summary>
+          <p>No. Chart series are derived from a deterministic seed keyed to each symbol so the visuals stay stable across launches without requiring a network connection. They are illustrative, not predictive, and are not real-time market data.</p>
+        </details>
+        <details>
+          <summary>Can I export my data?</summary>
+          <p>Yes. Use the Export sheet to download every transaction as CSV, the full app state as JSON for backup or transfer, or a PNG portfolio card. Exports are written to a temporary file you share through the system share sheet.</p>
+        </details>
+        <details>
+          <summary>How does cost basis work?</summary>
+          <p>Weighted average. Buys update the average, sells reduce share count without changing the average, dividends can reduce basis if reinvested, and splits change share count without changing total cost. Realized P/L uses the running average as the sale benchmark.</p>
+        </details>
+        <details>
+          <summary>How do I delete everything?</summary>
+          <p>Open Preferences → Reset All Data, type RESET, and confirm. This permanently deletes every portfolio, transaction, tag, attachment, watchlist item, and price alert on the device.</p>
+        </details>
+        <details>
+          <summary>Is this investment advice?</summary>
+          <p>No. Nothing in the app is a recommendation to buy or sell any security, a price target, or a solicitation. You are responsible for your own decisions and for tax accuracy. Consult a licensed advisor for personal guidance.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download">
+    <div class="container">
+      <div class="final-cta">
+        <h2>Start a journal you'll actually keep.</h2>
+        <p>MSFI Investor is free of accounts, ads, and cloud lock-in. Open the app, record your first trade, and the journal starts working for you.</p>
+        <a class="btn btn-primary" href="#" style="font-size:16px;padding:14px 22px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.43 2.235-1.13 3.06-.74.86-1.95 1.5-2.99 1.41-.13-1.12.39-2.28 1.06-3.04.74-.86 2.01-1.5 3.06-1.43zM21 17.31c-.43 1.02-.94 2.01-1.62 2.91-.94 1.24-1.81 2.49-3.27 2.51-1.43.02-1.79-.93-3.71-.92-1.92.01-2.32.94-3.75.93-1.46-.02-2.3-1.27-3.24-2.51C2.16 16.43 1.6 11.7 4.27 8.84c1.34-1.43 3.31-2.34 5.21-2.34 1.93 0 3.14.99 4.74.99 1.55 0 2.49-.99 4.7-.99 1.67 0 3.45.91 4.72 2.49-4.14 2.27-3.46 8.18-2.64 8.32z"/></svg>
+          Get MSFI Investor for iPhone
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>© <span id="year"></span> MSFI Investor · Personal Investment Journal</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="support.html">Support</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="mailto:karlawsokunevajob68@gmail.com">Contact</a>
+    </div>
+  </div>
+</footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body>
+</html>
